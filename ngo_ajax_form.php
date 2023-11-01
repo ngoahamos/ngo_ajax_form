@@ -4,6 +4,8 @@
  * Plugin Name: NGO AJAX Form
  * Description: Simple Ajax Form
  * Author: Amos Ngoah
+ * License: GPLv3
+ * PluginURI: https://github.com/ngoahamos/ngo_ajax_form
  * Author URI: https://github.com/ngoahamos/ngo_ajax_form
  * Version: 1.0.0
  */

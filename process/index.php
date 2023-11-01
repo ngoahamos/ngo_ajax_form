@@ -11,8 +11,16 @@ $response["cards"] = [];
 
 
 function get_customer_id($email) {
+
+    $users = get_users(array( "meta_key"=>"billing_email", "meta_value"=> $email));
+ 
+    if(!empty($users)) {
+        return $users[0]->ID;
+    }
  
     $user = get_user_by('email', $email);
+
+   
 
     if ($user) {
         return $user->ID;
@@ -93,6 +101,58 @@ function get_customer_cards($customer_id) {
     return $_cards;
 }
 
+function get_customer_cards_by_billing_email( $customer_email ) {
+    $_cards = [];
+    $customer_orders = wc_get_orders(array('billing_email' => $customer_email));
+    
+
+    // Loop through the orders
+    $key = 0;
+    foreach ($customer_orders as $partial) {
+   
+
+        if ($partial->post_status == 'wc-completed') {
+           
+            $order = new WC_Order($partial->ID);
+    
+            // Get the order ID
+            $order_id = $order->get_id();
+        
+            // Get order details
+            $order_date = $order->get_date_created()->format('Y-m-d H:i:s');
+  
+
+            // Get order items
+            $order_items = $order->get_items();
+
+            $composite = '';
+    
+            $serial = "";
+       
+            foreach ($order_items as $item_id=> $item) {
+
+                $product_id = $item->get_product_id();
+
+                $serial = display_order_item_meta($item_id,$item,$product_id);
+                
+            }
+            if ($serial) {
+                $_cards[] = ['order_id' => $order_id, 'date' => $order_date, 'serial' => $serial];
+            }
+            
+
+
+            $key++;
+
+        } else {
+            $key++;
+            continue;
+        }
+    
+    }
+
+    return $_cards;
+}
 function display_order_item_meta( $item_id, $item, $product_id ) {
     try {
         $order_id = wc_get_order_id_by_order_item_id( $item_id );
@@ -155,6 +215,8 @@ if (isset($_POST['submit_id']) && $_POST['submit_id'] == 1) {
     if ($customer_id != "") {
   
         $cards = get_customer_cards($customer_id);
+    } else {
+        $cards = get_customer_cards_by_billing_email($email);
     }
     
     if (count($cards) > 0) {
