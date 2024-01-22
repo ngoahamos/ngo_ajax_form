@@ -3,7 +3,7 @@
 $path = preg_replace('/wp-content.*$/','',__DIR__);
 require_once($path . 'wp-load.php');
 $response = [];
-$response["message"] = "Invalid Provided";
+$response["message"] = "Invalid Data Provided";
 $response["status"] = false;
 $response["cards"] = [];
 
@@ -80,7 +80,7 @@ function get_customer_cards($customer_id) {
 
                 $product_id = $item->get_product_id();
 
-                $serial = display_order_item_meta($item_id,$item,$product_id);
+                $serial = ngo_ajax_form_display_order_item_meta($item_id,$item,$product_id);
                 
             }
             if ($serial) {
@@ -101,7 +101,7 @@ function get_customer_cards($customer_id) {
     return $_cards;
 }
 
-function get_customer_cards_by_billing_email( $customer_email ) {
+function ngo_ajax_form_get_customer_cards_by_billing_email( $customer_email ) {
     $_cards = [];
     $customer_orders = wc_get_orders(array('billing_email' => $customer_email));
     
@@ -133,7 +133,7 @@ function get_customer_cards_by_billing_email( $customer_email ) {
 
                 $product_id = $item->get_product_id();
 
-                $serial = display_order_item_meta($item_id,$item,$product_id);
+                $serial = ngo_ajax_form_display_order_item_meta($item_id,$item,$product_id);
                 
             }
             if ($serial) {
@@ -153,7 +153,7 @@ function get_customer_cards_by_billing_email( $customer_email ) {
 
     return $_cards;
 }
-function display_order_item_meta( $item_id, $item, $product_id ) {
+function ngo_ajax_form_display_order_item_meta( $item_id, $item, $product_id ) {
     try {
         $order_id = wc_get_order_id_by_order_item_id( $item_id );
 
@@ -216,7 +216,7 @@ if (isset($_POST['submit_id']) && $_POST['submit_id'] == 1) {
   
         $cards = get_customer_cards($customer_id);
     } else {
-        $cards = get_customer_cards_by_billing_email($email);
+        $cards = ngo_ajax_form_get_customer_cards_by_billing_email($email);
     }
     
     if (count($cards) > 0) {
